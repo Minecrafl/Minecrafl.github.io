@@ -1,442 +1,89 @@
-
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149357628-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-149357628-1');
-</script>
-
-        <meta charset="UTF-8"/>
-        <meta name="keywords" content="OIerDb,OIer数据库,信息学竞赛学校排名" />
-        <meta name="description" content="OIerDb是一个方便信息学竞赛选手查询获奖记录并对学校进行排名的数据库。网站诞生在2018年2月，有时也会咕咕咕的更新。作为工具网站受到竞赛选手的欢迎。" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <script src="https://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-        <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
-        <link rel="stylesheet" href="style.css"/>
-        <script src="chart.js"></script><script src="mychart.js"></script>
-        
-            </head>
-    <body>
-        <title>OIerDb</title>
-        <div id = "school_view" class = "win" style = "flex-flow: column;display:none;">
-            <div>
-                <h2 id = "sch_name">
-                </h2>
-                <button onclick = "document.getElementById('school_view').style = 'display:none'" class = "sqrbtn extbtn fa fa-mail-reply"></button>
-                <div id = "sch_desc">
-                    
-                </div>
-                <hr/>
-            </div>
-            <div style = "text-align:center;" >
-                <div class="btn-group" role="group" aria-label="..." id = "con-group">
-                </div>
-            </div>
-            <br/>
-            <div style = "flex: 1;border:2px solid #ffffff">
-                <canvas id="canvas" style = "background:#ffffff"></canvas>
-            </div>
-        </div>
-
-        <div id="container">
-            
-            <br/>
-            <div  style = "text-align:center;">
-                <a href = "index.html"><img src="logo.jpg" style = "width:60%;"/></a>
-            </div>
-            <div class="search">
-                <div class = "cof  bar8">
-                    <input type="text" id = "infoinput" onkeydown="var e=window.event || arguments[0];if(e.keyCode==13){search(0)}" placeholder="请输入以空格分割的信息..." autofocus = "autofocus"/>
-                    <button onclick = "search(0)" class = "sqrbtn"></button>
-                </div>
-                <div style = "text-align: center;">
-                    <button data-toggle="collapse" data-target="#adv-search" aria-expanded="true" aria-controls="info">高级搜索……</button>
-                    <div class="collapse" id="adv-search" aria-expanded="false">
-                        <div class="form-inline bar9" role="form">
-                            <input id = "adv_name" type="text" placeholder="姓名"/>
-                            <input id = "adv_pinyin" type="text" placeholder="姓名拼音"/>
-                            <input id = "adv_school" type="text" placeholder="学校"/>
-                            <input id = "adv_prov" type="text" placeholder="省份"/>
-                            <select id = "year_select">
-                                <option value ="">年级</option>
-                                <option value ="2014">高三</option>
-                                <option value ="2015">高二</option>
-                                <option value ="2016">高一</option>
-                                <option value ="2017">初三</option>
-                                <option value ="2018">初二</option>
-                                <option value ="2019">初一</option>
-                                <option value ="2020">六年级</option>
-                                <option value ="2021">五年级</option>
-                            </select>
-                            <button style = "border: 1px solid #ffffff;" onclick = "search(1)">搜索</button>
-                        </div>
-                    </div>
-                    <p style = "font-size:12px;color:#888">最新更新：详见GitHub</p>
-                </div>
-                
-            </div>
-            
-            <br/><br/>
-            <div id = "dataArea" style = "display:">
-                <table class="table" id="resultTable">
-                    <thead>
-                        <tr>
-                            <th>姓名</th>
-                            <th>省份</th>
-                            <th>年级</th>
-                        </tr>
-                    </thead>
-                    <tbody id = "resultArea">
-                        <tr id = "load_svg" style = "display:none"><td colspan="3" style = "text-align:center"><img  src = "loading.svg" width = 45px/></td></tr>
-                        <tr id = "noresult" style = "display:none">
-                            <td colspan="3" style = "text-align:center">
-                                已完成搜索：<b>无结果</b>
-                            </td>
-                        </tr>
-                        <tr role="button" onclick = "window.location.href = 'rank.html'">
-                            <td colspan="3" style = "text-align:center">
-                                全国信息学竞赛学校排名2021
-                            </td>
-                        </tr>
-                        <tr role="button" data-toggle="collapse" data-target="#info" aria-expanded="true" aria-controls="info">
-                            <td colspan="3" style = "text-align:center">
-                                关于OIerDb
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div class="collapse in" id="info" aria-expanded="true" style="padding:20px;">
-                                    <h3>Q: 这是什么网站？<a href="https://github.com/WZKSDN/OIer"><img alt="GitHub watchers" src="https://img.shields.io/github/watchers/WZKSDN/OIer.svg?style=social&amp;label=Watch"></a> <a href="https://github.com/WZKSDN/OIer"><img alt="GitHub stars" src="https://img.shields.io/github/stars/WZKSDN/OIer.svg?style=social&amp;label=Stars"></a></h3>
-                                    <p>这是一个信息学竞赛选手获奖记录并对学校进行排名的数据库。本网站名为"OIerDb"。数据库诞生在2018年2月，有时也会咕咕咕的更新。</p>
-                                    <p>
-                                    OIerDb原始数据不接受任何修改，除非是为了与noi.cn保持一致。但学校和人的合并、拼音生成等其他问题可以通过GitHub上进行修改。
-                                    </p>
-                                    <h3>Q: 我能够做什么？</h3>
-                                    <p>
-                                    你能够在这个网站上查询选手的获奖记录，可以通过姓名、姓名首字母缩写、省份、学校等限定，点击学校名称可以获得学校的数据。
-                                    </p>
-                                    <p>
-                                    同时，这个项目也在<a href = "https://github.com/WZKSDN/OIer">GitHub</a>上开源，有任何问题可以直接issue，也强烈欢迎你帮助改进算法。
-                                    </p>
-                                    <p>
-                                    <b>非常欢迎</b>加入用户群 : 813305282(OIerDb用户群).
-                                    </p>
-                                    <p>
-                                        <a href = "https://github.com/nocrizwang/OIer/wiki/如何订正数据">
-                                            修改错误数据现在全部在GitHub完成。请点我了解详情。
-                                        </a>
-                                    </p>
-                                    <p>
-                                    本网站部分元数据(详见GitHub)来源于由fjzzq2002神犇爬取并整理，发布在开源项目中的数据，在此向他表示真挚的感谢！
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <script>
-            function GetQueryString(name)
-            {
-                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-                var r = window.location.search.substr(1).match(reg);
-                if (r != null) {
-                    return r[2];
-                }
-                return null;
-            };
-            var contest_names = ["NOIP普及","NOIP提高","CSP入门","CSP提高","NOIP","APIO","CTSC","NOI","NOID类","WC","IOI"];
-            var award_desc = {"NOIP普及":["一等奖","二等奖","三等奖"],"CSP入门":["一等","二等","三等"],"CSP提高":["一等","二等","三等"],"NOIP提高":["一等奖","二等奖","三等奖"],"NOIP":["一等奖","二等奖","三等奖"],"APIO":["金牌","银牌","铜牌"],"CTSC":["金牌","银牌","铜牌"],"NOI":["金牌","银牌","铜牌"],"NOID类":["金牌","银牌","铜牌"],"WC":["金牌","银牌","铜牌"],"IOI":["金牌","银牌","铜牌"]};
-            var contest_years = {"NOIP普及":2013,"NOIP提高":2008,"CSP入门":2019,"CSP提高":2019,"NOIP":2020,"APIO":2010,"CTSC":2010,"NOI":2009,"NOID类":2010,"WC":2015,"IOI":2010};
-            var contest_years2 = {"NOIP普及":2018,"NOIP提高":2018,"CSP入门":2020,"CSP提高":2020,"NOIP":2020,"APIO":2021,"CTSC":2019,"NOI":2021,"NOID类":2021,"WC":2021,"IOI":2021};
-            var year = ["五年级","六年级","初一","初二","初三","高一","高二","高三"];
-            var year2 = ["四年级","三年级","二年级","一年级"];
-            var cacheData;
-            var awards;
-            var cacheSchoolData;
-            var cv = document.getElementById("resultArea").innerHTML;
-            var data_end_height;
-            var last_query;
-            var datas_cnt;
-            var pages;
-            var data_end;
-
-            function deepClone(obj){
-                let _obj = JSON.stringify(obj),
-                objClone = JSON.parse(_obj);
-                return objClone
-            }
-        
-        
-        function getGrade(s){
-            var yea = undefined;
-
-            if(s < 0){
-                yea = year2[-(s+1)];
-            }else{
-                if(s > 7){
-                    yea = "高中毕业"+(s-7)+"年";
-                }else{
-                    yea = year[s];
-                }
-            }
-
-            if(yea == undefined) yea = "----";
-            return yea;
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>你都认识2026届24班的谁？</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
         }
-        function showSchoolAwards(s){
-            config["data"]["datasets"] = [];
-            var cur_year = [];
-            for(var i=contest_years[s];i<=contest_years2[s];i++)cur_year.push(i.toString());
-            for(var i  = 0;i<document.getElementById("con-group").childElementCount;i++){
-                if(document.getElementById("con-group").children[i].className.includes("minebtn-ac"))
-                document.getElementById("con-group").children[i].className = "btn minebtn";
-            }
-            if( document.getElementById(s).className.includes("minebtn-ac")){
-                
-            }else{
-                config["data"]["labels"] = deepClone(cur_year);
-                document.getElementById(s).className = "btn minebtn-ac";
-                config["data"]["datasets"] = deepClone(model);
-                for(var i=0;i<=2;i++){
-                    config["data"]["datasets"][i]["data"] = []
-                    config["data"]["datasets"][i]["label"]=s+award_desc[s][i];
-                    for(var j in cur_year){
-                        cy = cur_year[j];
-                        if(cy in cacheSchoolData["awards"][s])
-                        config["data"]["datasets"][i]["data"].push(cacheSchoolData["awards"][s][cy][i]);
-                        else
-                        config["data"]["datasets"][i]["data"].push(0);
-                    }
-                }
-                
-            }
-            //var ctx = document.getElementById('canvas').getContext('2d');
-            window.myLine.update();
+        #inputBox {
+            width: 300px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
-        function showSchoolInfo(s,p){
-            document.getElementById('sch_desc').innerHTML = '<img src = "loading.svg" width = 45px/>';
-            document.getElementById('con-group').innerHTML = '';
-            document.getElementById('school_view').style = 'flex-flow: column;display:flex';
-            document.getElementById('sch_name').innerHTML = p+'<a href = "https://bytew.net/OIer/school.html?schoolid='+s.toString()+'"><i class="bi bi-link-45deg"></i></a>';
-            config["data"]["datasets"] = [];
-            window.myLine.update();
-            var XMLHttp=new XMLHttpRequest()
-            XMLHttp.open("GET","school.php?id="+s.toString());
-            XMLHttp.send();
-            XMLHttp.onreadystatechange=function(){
-                if (XMLHttp.readyState==4 && XMLHttp.status==200){
-                    if(XMLHttp.responseText!=""){
-                        var datas = eval("(" + XMLHttp.responseText + ")").result[0];
-                        datas["name"] = eval(datas["name"]);
-                        datas["awards"] = eval("(" + datas["awards"]+ ")");
-                        var c_desc = "";
-                        if(datas["name"].length>2){
-                            c_desc = "<p>又名";
-                            for(var i in datas["name"]){
-                                var cn = datas["name"][i];
-                                if(cn!=p) c_desc+=cn+","
-                            }
-                            c_desc = c_desc.substr(0,c_desc.length-1)+"。</p>";
-                        }
-                        c_desc+="<p>综合评分: <b>"+datas["rating"]+"</b>，综合评级<b>"+datas["division"]+"</b>。"
-                        c_desc+="学校编号是 "+s.toString()+"。</p>";
-                        document.getElementById('sch_desc').innerHTML = c_desc;
-                        
-                        for(var i in contest_names){
-                            var cur_con = contest_names[i];
-                            if(cur_con in datas["awards"]){
-                                document.getElementById('con-group').innerHTML+='<button type="button" class="btn minebtn" id = "'+cur_con+'" onclick = "showSchoolAwards(\''+cur_con+'\')">'+cur_con+'</button>';
-                            }else{
-                                document.getElementById('con-group').innerHTML+='<button type="button" class="btn minebtn disabled">'+cur_con+'</button>';
-                            }
-                        }
-                        cacheSchoolData = datas;
-                    }
-                }
-            }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .count {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>你都认识2026届24班的谁</h1>
+    <div class="count">我认识的人的数量 <span id="matchCount">0</span></div>
+    <input type="text" id="inputBox" placeholder="请输入姓名">
+    <table>
+        <thead>
+            <tr>
+                <th>姓名</th>
+            </tr>
+        </thead>
+        <tbody id="recordList">
+        </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        // 示例MD5列表
+        var validMd5s = ['d43f9a3120cd0e14149733f0f9e9d505', '336853925a0e9fce5cc5250bed772b1d', '90c73a58790635859148f28bac772536', '1f6963bf78bd866a4fa0102c72f877f8', '92b7e34776abd54a9f4b3837b95adb2d', '68e5d119326f6d0a18784e782f1af35', 'f4b3d5ebc1972da3020c2f0106bb0c96', '66c6ccc35ad234fb57dff37803a6862e', '13435685b0c8e44cef169b5200ab66d','c684298df927bb2e8712f752e0ef0010', '6e9a8cc8bedbabd8446ed416b7c6e073', '35f2f498b8ff0651bbef78ed509338a','44c5697f0d1949a7511856efce0c5306', 'fe5a274d3884aca32c3fc49c90ed6c70', 'b9a5189c3c421639305a54553e7fdc84', 'e803542d9ddef749551f3558ed057bca', '4cc4b8d121da98ef0b791ab8a05b429','86e8a881569d21247468bf93784ed0ec', '5f7e06929101668cb05ae519d42e2d34', '1daeabcb8c9c159e97518663345c7330', 'd20b9e5a60b804c6c3071856a67bf16','6956f3338b66b2ca5cbe0c43ab98c1c4', '51b5a36f8dda1804521f49adb09b4d96', 'f7a64d786541b88a491a46245f493b4f', 'b382fcd51288bc93a9e5ca994a367318', '5b445abcb52560f7b4d776769c598234', '05ba33951072756147662f891cdafb7a', 'e63a6c0cad8c3d3ba04574d55b20f99a', '6720e6f5841253ae271e4485921a8ec4', 'd95fedeaad956cbeb67db972b9874bbb', '048610fe19de2e1447105225dbf44a40', '238ecf6e429c9d20abf45aaf80e46722', '4db06b804201d481078b76ccd2acbf88', '02431bf18ebaa7776d70827aa551010c', '2c033c6444c9a003b2549be16ae1ac00', '36616bdb91c4040f56c34070ccb283be', 'c19b7e96b0f142c9979629b2a8d574ee', '742a508cfb43afa2b9c046ff05d01bdf', '68ceffccb5561cb5688195cee70cae53', '1c2a5a00b341329454422a85da654365', '9a7153e5d321af6448789a9f7b993f60', 'e031fb1c0d44441ad1eedfe4ada97a14', '866b6f7e3533df25ceffcf6d4d0ca9d3', 'df69c1e1c8d6cc5e67a9fb5ee7d8e9b3', '819fed88d46eed64806f0025547fa9a','5fcec3824cead5497ff753d67bfddc7a', '9dcbae2cc86c5e46624af00474c7b646', 'bedd3ee564e7900475c4be2dc4d68466', '1b6ae82237b9eb0da1d57b565d686208', '7f3d92c8bc6c0ad6aa4a016946f9e1e3', '4732a12dbf2d7eb1622d738135a03cb0', '52df3dca0ceee207af345269eab304c5', 'a1a04b208a6bb81f74277b5ba7b441dd', '82d3c557d1105d56ae61438372c066be', '3f27f454144a430a2b8962923829cfb3', 'b5fce8ec9fafa1ec81aa6b4f4309943c', '69b6b6b5bff11c3afff201227bd9e646', 'ed6eb1abb773b32d9ea629db6071d29a', '831fb837431e00261761a2c2240373cc', 'ecbcf68ff6b64a1ae9dcee8e120bb84e', '6d520216b956386a45d27955b881115a'];
+        // 已记录的输入内容
+        var existingRecords = [];
+        // 成功匹配数量
+        var matchCount = 0;
+
+        // MD5加密函数
+        function md5(text) {
+            return CryptoJS.MD5(text).toString();
         }
 
-        　　function getElementTop(element){
-        　　　　var actualTop = element.offsetTop;
-        　　　　var current = element.offsetParent;
+        document.getElementById('inputBox').addEventListener('input', function(event) {
+            var input = event.target.value.trim();
+            if (!input) return; // 避免空字符串的情况
 
-        　　　　while (current !== null){
-        　　　　　　actualTop += current.offsetTop;
-        　　　　　　current = current.offsetParent;
-        　　　　}
-
-        　　　　return actualTop;
-        　　}
-
-        function search(type){
-            datas_cnt = 0;
-            pages = 1;
-            data_end = false;
-
-            document.getElementById("noresult").style = "display:none";
-            document.getElementById("load_svg").style = "display:";
-            var XMLHttp=new XMLHttpRequest()
-            if(type == 0){
-                last_query = "search.php?method=normal&q="+document.getElementById("infoinput").value;
-            }else{
-                last_query = "search.php?method=specific&name="+$("#adv_name").val()+"&pinyin="+$("#adv_pinyin").val()+"&school="+$("#adv_school").val()+"&province="+$("#adv_prov").val()+"&year="+$("#year_select").val();
+            var encryptedInput = md5(input);
+            if (validMd5s.includes(encryptedInput) && !existingRecords.includes(input)) {
+                // 清空输入框
+                this.value = '';
+                // 更新成功匹配数量
+                matchCount++;
+                document.getElementById('matchCount').textContent = matchCount;
+                // 添加到表格
+                var tbody = document.getElementById('recordList');
+                var newRow = document.createElement('tr');
+                var cell = document.createElement('td');
+                cell.textContent = input;
+                newRow.appendChild(cell);
+                tbody.appendChild(newRow); // 将新行插入到表格底部
+                existingRecords.push(input);
             }
-            XMLHttp.open("GET",last_query,true);
-            XMLHttp.send();
-            XMLHttp.onreadystatechange=function(){
-                document.getElementById("load_svg").style = "display:none";
-                if (XMLHttp.readyState==4 && XMLHttp.status==200){
-                    if(XMLHttp.responseText!=""){
-                        var ra = document.getElementById("resultArea");
-                        document.getElementById("dataArea").style.display = "";
-                        ra.innerHTML = "";
-                        var datas = eval("(" + XMLHttp.responseText + ")")["result"];
-                        cacheData = datas;
-                        for(var i in datas){
-                            var sf = [],sfc = "";
-                            awards = eval("(" + datas[i]["awards"] + ")");
-                            for(var j in awards){
-                                var cur_p = awards[j]["province"];
-                                if(sf.indexOf(cur_p)>=0) continue;
-                                sf.push(cur_p);
-                                if(sf.length>1)sfc+="/";
-                                sfc+=cur_p;
-                            }
-                            var yea = getGrade(2021-parseInt(datas[i]["year"]));
-                            var award_badges,award_detail;
-                                 var query_detail = datas[i]["re1"];
-                            award_detail = '<font style = "font-size:xx-large">'+datas[i]["name"]+'</font><font style = "font-size:large">,现在'+yea+'</font>'+'<font style="font-size:x-large"><a href="https://bytew.net/OIer/?query='+encodeURIComponent(query_detail)+'"><i class="bi bi-link-45deg"></i></a></font>'+'<table class="table table-bordered" ><thead><tr><th>获奖</th><th>分数</th><th>选手排名</th><th>就读学校</th><th>年级</th></tr></thead>'
-                            for(var each_award in awards){
-                                var current_Award = awards[each_award];
-                                award_detail+='<tr><th scope = "row">'+current_Award["identity"]+current_Award["award_type"]+'</th><td>'+current_Award["score"]+'</td><td>'+current_Award["rank"]+'</td><td onclick = "showSchoolInfo('+current_Award["school_id"]+',\''+current_Award["school"]+'\')" style = "cursor:pointer">'+current_Award["school"]+'</td><td>'+current_Award["grade"]+'</td></tr>';
-                            }
-                            ++datas_cnt;
-                            
-                            award_detail+='</table>'
-                            ra.innerHTML+='<tr role="button" id="row-'+datas_cnt+'" data-toggle="collapse" data-target="#'+datas[i]["id"]+'" aria-expanded="false" aria-controls="'+datas[i]["id"]+'"><th scope="row">'+datas[i]["name"]+'</th><td>'+sfc+'</td><td>'+yea+'</td></tr>';
-                            ra.innerHTML+='<tr id="hidden-'+datas_cnt+'"><td colspan="3" style = "padding:3px"><div class="collapse" id = "'+datas[i]["id"]+'">'+award_detail+'</div></td></tr>'
-                        }
-                        ra.innerHTML+=cv;
-                        if(datas.length == 0){
-                            document.getElementById("noresult").style = "display:";
-                        }
-                    }
-                    
-                    var div = document.getElementById('row-'+datas_cnt);
-                    data_end_height = getElementTop(div);
-                }
-            }
-        }
-
-    function debounce(func, wait, immediate) {
-        var timeout;
-        return function() {
-            clearTimeout(timeout);
-            timeout = setTimeout(func, wait);
-        };
-    };
-    
-    var load_flag = false;
-
-    function sleep(ms) {
-        return new Promise(resolve =>
-            setTimeout(resolve, ms)
-        )
-    }
-
-    function realFunc(){
-        totalheight = parseFloat($(window).scrollTop())+$(window).height();
-        if(data_end == false && load_flag == false && totalheight > data_end_height + 100) {
-            load_flag = true;
-
-            document.getElementById("noresult").style = "display:none";
-            document.getElementById("load_svg").style = "display:";
-
-            sleep(500).then(()=>{
-                var XMLHttp=new XMLHttpRequest()
-                var newquery = last_query+"&pages="+(pages+1);
-
-                XMLHttp.open("GET",newquery,true);
-                XMLHttp.send();
-                XMLHttp.onreadystatechange=function(){
-                    document.getElementById("load_svg").style = "display:none";
-                    var pos = document.getElementById('hidden-'+datas_cnt);
-
-                    if (XMLHttp.readyState==4 && XMLHttp.status==200){
-                        if(XMLHttp.responseText!=""){
-                            pages = pages + 1;
-                            var appendHTML= "";
-                            var datas = eval("(" + XMLHttp.responseText + ")")["result"];
-                            cacheData = datas;
-                            for(var i in datas){
-                                var sf = [],sfc = "";
-                                awards = eval("(" + datas[i]["awards"] + ")");
-                                for(var j in awards){
-                                    var cur_p = awards[j]["province"];
-                                    if(sf.indexOf(cur_p)>=0) continue;
-                                    sf.push(cur_p);
-                                    if(sf.length>1)sfc+="/";
-                                    sfc+=cur_p;
-                                }
-                                var yea = getGrade(2021-parseInt(datas[i]["year"]));
-                                var sex  = ["女","--","男"];
-                                var award_badges,award_detail;
-                                var query_detail = datas[i]["re1"];
-                                award_detail = '<font style = "font-size:xx-large">'+datas[i]["name"]+'</font><font style = "font-size:large">,现在'+yea+'</font>'+'<font style="font-size:x-large"><a href="https://bytew.net/OIer/?query='+encodeURIComponent(query_detail)+'"><i class="bi bi-link-45deg"></i></a></font>'+'<table class="table table-bordered" ><thead><tr><th>获奖</th><th>分数</th><th>选手排名</th><th>就读学校</th><th>年级</th></tr></thead>'
-                                for(var each_award in awards){
-                                    var current_Award = awards[each_award];
-                                    award_detail+='<tr><th scope = "row">'+current_Award["identity"]+current_Award["award_type"]+'</th><td>'+current_Award["score"]+'</td><td>'+current_Award["rank"]+'</td><td onclick = "showSchoolInfo('+current_Award["school_id"]+',\''+current_Award["school"]+'\')" style = "cursor:pointer">'+current_Award["school"]+'</td><td>'+current_Award["grade"]+'</td></tr>';
-                                }
-                                ++datas_cnt;
-                                award_detail+='</table>'
-                                appendHTML+='<tr role="button" id="row-'+datas_cnt+'" data-toggle="collapse" data-target="#'+datas[i]["id"]+'" aria-expanded="false" aria-controls="'+datas[i]["id"]+'"><th scope="row">'+datas[i]["name"]+'</th><td>'+sfc+'</td><td>'+yea+'</td></tr>';
-                                appendHTML+='<tr id="hidden-'+datas_cnt+'"><td colspan="3" style = "padding:3px"><div class="collapse" id = "'+datas[i]["id"]+'">'+award_detail+'</div></td></tr>'
-                            }
-
-                            if(datas.length == 0){
-                                data_end = true;
-                            }
-
-                            pos.insertAdjacentHTML('afterend', appendHTML);
-
-                            var div = document.getElementById('row-'+datas_cnt);
-                            data_end_height = getElementTop(div);
-                        }
-                    }
-
-                    load_flag = false;
-                }
-            })
-        }
-    }
-
-        window.addEventListener('scroll',debounce(realFunc,30));
-        var nameVal=GetQueryString("query");
-        if(nameVal!=null){
-            try {
-                document.getElementById("infoinput").value = decodeURIComponent(nameVal);
-                search(0);
-            }
-            catch(err) {
-                
-            }
-        }
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>
-
-
