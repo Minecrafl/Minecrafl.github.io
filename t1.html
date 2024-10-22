@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>找中点游戏</title>
+<style>
+  body, html { height: 100%; margin: 0; overflow: hidden; }
+  #gameCanvas { background: #f4f4f4; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+  .point { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: red; }
+  .midPoint { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: blue; display: none; }
+  #score { position: absolute; top: 20px; left: 20px; font-size: 24px; color: black; }
+</style>
+</head>
+<body>
+<div id="gameCanvas"></div>
+<div id="score">得分: 0</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const scoreDisplay = document.getElementById('score');
+
+let points = [];
+let midPoint;
+let roundScore = 0;
+let roundCount = 0;
+
+function startNewRound() {
+  // 清除上一回合的点
+  while (canvas.firstChild) {
+    canvas.removeChild(canvas.firstChild);
+  }
+
+  // 生成新的两点
+  const pointA = createPoint();
+  const pointB = createPoint();
+
+  // 计算并显示中点
+  midPoint = calculateMidPoint(pointA, pointB);
+  showMidPoint(midPoint);
+
+  // 设置点击事件监听器
+  canvas.addEventListener('click', handlePlayerClick);
+
+  // 更新回合计数
+  roundCount++;
+}
+
+function createPoint() {
+  const x = Math.random() * (canvas.clientWidth - 10);
+  const y = Math.random() * (canvas.clientHeight - 10);
+  const point = document.createElement('div');
+  point.classList.add('point');
+  point.style.left = `${x}px`;
+  point.style.top = `${y}px`;
+  canvas.appendChild(point);
+  return { element: point, x, y };
+}
+
+function calculateMidPoint(p1, p2) {
+  const x = (p1.x + p2.x) / 2;
+  const y = (p1.y + p2.y) / 2;
+  return { x, y };
+}
+
+function showMidPoint(midPoint) {
+  const marker = document.createElement('div');
+  marker.classList.add('midPoint');
+  marker.style.left = `${midPoint.x - 5}px`; // 调整位置以匹配圆心
+  marker.style.top = `${midPoint.y - 5}px`;
+  canvas.appendChild(marker);
+}
+
+function handlePlayerClick(event) {
+  const playerX = event.clientX;
+  const playerY = event.clientY;
+  const distance = Math.sqrt(Math.pow(playerX - midPoint.x, 2) + Math.pow(playerY - midPoint.y, 2));
+
+  if (distance < 20) {
+    roundScore += 10;
+  } else if (distance < 40) {
+    roundScore += 5;
+  }
+
+  updateScore();
+
+  // 移除点击事件监听器
+  canvas.removeEventListener('click', handlePlayerClick);
+
+  // 定时器设置下一回合
+  setTimeout(startNewRound, 10000);
+}
+
+function updateScore() {
+  scoreDisplay.textContent = `得分: ${roundScore}`;
+}
+
+// 开始第一回合
+startNewRound();
+</script>
+</body>
+</html>
