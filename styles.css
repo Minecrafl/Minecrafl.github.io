@@ -1,0 +1,40 @@
+body {
+    background-color: #faf8ef;
+    color: #776e65;
+    font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+}
+
+.game-container {
+    width: 600px;
+    height: 600px;
+    margin: 0 auto;
+    position: relative;
+    background: #bbada0;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.grid-container {
+    position: absolute;
+    width: 525px;
+    height: 525px;
+    margin: 0 auto;
+}
+
+.grid-row {
+    display: flex;
+}
+
+.grid-cell {
+    width: 25%;
+    height: 25%;
+    border-radius: 3px;
+    background: #ccc0b4;
+    margin: 5px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 125px;
+    font-size: 55px;
+    font-weight: bold;
+}
