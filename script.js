@@ -52,7 +52,57 @@ function updateBoard() {
 }
 
 function moveTiles(direction) {
-    // Implement tile movement logic here
+    let hasMoved = false;
+
+    // Helper function to merge tiles
+    function mergeTiles(arr) {
+        for (let i = 0; i < arr.length - 1; i++) {
+            if (arr[i] && arr[i] === arr[i + 1]) {
+                arr[i] *= 2;
+                arr[i + 1] = 0;
+                hasMoved = true;
+            }
+        }
+    }
+
+    // Helper function to slide tiles
+    function slideTiles(arr) {
+        return arr.filter(cell => cell).concat(arr.filter(cell => !cell));
+    }
+
+    if (direction === 'up') {
+        for (let col = 0; col < 4; col++) {
+            const column = [board[0][col], board[1][col], board[2][col], board[3][col]];
+            mergeTiles(slideTiles(column));
+            for (let row = 0; row < 4; row++) {
+                board[row][col] = column[row];
+            }
+        }
+    } else if (direction === 'down') {
+        for (let col = 0; col < 4; col++) {
+            const column = [board[3][col], board[2][col], board[1][col], board[0][col]];
+            mergeTiles(slideTiles(column));
+            for (let row = 0; row < 4; row++) {
+                board[3 - row][col] = column[row];
+            }
+        }
+    } else if (direction === 'left') {
+        for (let row = 0; row < 4; row++) {
+            const rowArr = board[row].slice();
+            mergeTiles(slideTiles(rowArr));
+            board[row] = rowArr;
+        }
+    } else if (direction === 'right') {
+        for (let row = 0; row < 4; row++) {
+            const rowArr = board[row].slice().reverse();
+            mergeTiles(slideTiles(rowArr));
+            board[row] = rowArr.reverse();
+        }
+    }
+
+    if (hasMoved) {
+        addRandomTile();
+    }
 }
 
 document.addEventListener('keydown', (e) => {
