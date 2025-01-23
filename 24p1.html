@@ -20,20 +20,23 @@
     <input type="number" id="k" value="100"><br>
     <label for="M">大楼质量 M:</label>
     <input type="number" id="M" value="1000"><br>
+    <label for="m">摆锤质量 m:</label>
+    <input type="number" id="m" value="10"><br>
     <button onclick="startSimulation()">开始模拟</button>
     <canvas id="simulationCanvas" width="800" height="600"></canvas>
 
     <script>
-        let canvas, ctx, width, height, building, amplitude, omega, H, k, M, t = 0;
+        let canvas, ctx, width, height, building, pendulum, amplitude, omega, H, k, M, m, t = 0;
 
         function startSimulation() {
-            H = document.getElementById('H').value;
-            omega = document.getElementById('omega').value;
-            k = document.getElementById('k').value;
-            M = document.getElementById('M').value;
+            H = parseFloat(document.getElementById('H').value);
+            omega = parseFloat(document.getElementById('omega').value);
+            k = parseFloat(document.getElementById('k').value);
+            M = parseFloat(document.getElementById('M').value);
+            m = parseFloat(document.getElementById('m').value);
 
-            omega0 = Math.sqrt(k / M);
-            amplitude = H / Math.sqrt(Math.pow(k - M * Math.pow(omega, 2), 2) + Math.pow(M * omega, 2));
+            omega0 = Math.sqrt(k / (M + m));
+            amplitude = H / Math.sqrt(Math.pow(k - (M + m) * Math.pow(omega, 2), 2) + Math.pow((M + m) * omega, 2));
 
             canvas = document.getElementById('simulationCanvas');
             ctx = canvas.getContext('2d');
@@ -47,6 +50,12 @@
                 height: 100
             };
 
+            pendulum = {
+                x: building.x + 25,
+                y: building.y,
+                length: 50
+            };
+
             drawBackground();
             animate();
         }
@@ -56,17 +65,25 @@
             ctx.fillRect(0, 0, width, height);
             ctx.fillStyle = '#008000';
             ctx.fillRect(building.x, building.y, building.width, building.height);
+            ctx.beginPath();
+            ctx.moveTo(pendulum.x, pendulum.y);
+            ctx.lineTo(pendulum.x, pendulum.y - pendulum.length);
+            ctx.stroke();
         }
 
         function animate() {
             requestAnimationFrame(animate);
             t += 0.01;
 
+            // 更新摆锤位置
+            pendulum.y = building.y + pendulum.length * Math.sin(omega * t);
+
+            // 更新大楼位置
             building.y = height - 100 + amplitude * Math.sin(omega * t);
 
             drawBackground();
-            ctx.fillStyle = '#008000';
-            ctx.fillRect(building.x, building.y, building.width, building.height);
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(pendulum.x, pendulum.y - 10, 10, 10);
         }
     </script>
 </body>
