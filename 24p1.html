@@ -25,8 +25,9 @@
     <button onclick="startSimulation()">开始模拟</button>
     <canvas id="simulationCanvas" width="800" height="600"></canvas>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
     <script>
-        let canvas, ctx, width, height, building, pendulum, amplitude, omega, H, k, M, m, t = 0;
+        let world, canvas, ctx, buildingBody, pendulumBody, H, omega, k, M, m;
 
         function startSimulation() {
             H = parseFloat(document.getElementById('H').value);
@@ -35,55 +36,50 @@
             M = parseFloat(document.getElementById('M').value);
             m = parseFloat(document.getElementById('m').value);
 
-            omega0 = Math.sqrt(k / (M + m));
-            amplitude = H / Math.sqrt(Math.pow(k - (M + m) * Math.pow(omega, 2), 2) + Math.pow((M + m) * omega, 2));
-
             canvas = document.getElementById('simulationCanvas');
             ctx = canvas.getContext('2d');
-            width = canvas.width;
-            height = canvas.height;
 
-            building = {
-                x: width / 2,
-                y: height - 100,
-                width: 50,
-                height: 100
-            };
+            world = new CANNON.World();
+            world.gravity.set(0, -9.81, 0);
+            world.broadphase = new CANNON.NaiveBroadphase();
 
-            pendulum = {
-                x: building.x + 25,
-                y: building.y,
-                length: 50
-            };
+            const buildingShape = new CANNON.Box(new CANNON.Vec3(50, 50, 1));
+            buildingBody = new CANNON.Body({ mass: M, shape: buildingShape });
+            buildingBody.position.set(0, 0, 0);
+            world.addBody(buildingBody);
 
-            drawBackground();
+            const pendulumShape = new CANNON.Cylinder(1, 1, 50, 16);
+            pendulumBody = new CANNON.Body({ mass: m, shape: pendulumShape });
+            pendulumBody.position.set(0, 50, 0);
+            world.addBody(pendulumBody);
+
+            const constraint = new CANNON.PointToPointConstraint(buildingBody, new CANNON.Vec3(0, 50, 0), pendulumBody, new CANNON.Vec3(0, 0, 0));
+            world.addConstraint(constraint);
+
             animate();
-        }
-
-        function drawBackground() {
-            ctx.fillStyle = '#f0f0f0';
-            ctx.fillRect(0, 0, width, height);
-            ctx.fillStyle = '#008000';
-            ctx.fillRect(building.x, building.y, building.width, building.height);
-            ctx.beginPath();
-            ctx.moveTo(pendulum.x, pendulum.y);
-            ctx.lineTo(pendulum.x, pendulum.y - pendulum.length);
-            ctx.stroke();
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            t += 0.01;
 
-            // 更新摆锤位置
-            pendulum.y = building.y + pendulum.length * Math.sin(omega * t);
+            const deltaTime = 1 / 60;
+            world.step(deltaTime);
 
-            // 更新大楼位置
-            building.y = height - 100 + amplitude * Math.sin(omega * t);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            drawBackground();
+            ctx.fillStyle = '#008000';
+            const buildingPos = buildingBody.position;
+            ctx.fillRect(buildingPos.x - 25, canvas.height - buildingPos.y - 25, 50, 50);
+
             ctx.fillStyle = '#ff0000';
-            ctx.fillRect(pendulum.x, pendulum.y - 10, 10, 10);
+            const pendulumPos = pendulumBody.position;
+            ctx.fillRect(pendulumPos.x - 5, canvas.height - pendulumPos.y - 5, 10, 10);
+
+            // Apply wind force
+            const windForce = new CANNON.Vec3(H * Math.cos(omega * Date.now()), 0, 0);
+            pendulumBody.applyForce(windForce, pendulumBody.position);
         }
     </script>
 </body>
