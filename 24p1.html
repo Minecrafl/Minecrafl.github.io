@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大楼振动模拟</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>大楼振动模拟</h1>
+    <label for="H">风的振幅 H:</label>
+    <input type="number" id="H" value="10"><br>
+    <label for="omega">风的频率 ω:</label>
+    <input type="number" id="omega" value="1"><br>
+    <label for="k">弹簧劲度系数 k:</label>
+    <input type="number" id="k" value="100"><br>
+    <label for="M">大楼质量 M:</label>
+    <input type="number" id="M" value="1000"><br>
+    <button onclick="startSimulation()">开始模拟</button>
+    <canvas id="simulationCanvas" width="800" height="600"></canvas>
+
+    <script>
+        let canvas, ctx, width, height, building, amplitude, omega, H, k, M, t = 0;
+
+        function startSimulation() {
+            H = document.getElementById('H').value;
+            omega = document.getElementById('omega').value;
+            k = document.getElementById('k').value;
+            M = document.getElementById('M').value;
+
+            omega0 = Math.sqrt(k / M);
+            amplitude = H / Math.sqrt(Math.pow(k - M * Math.pow(omega, 2), 2) + Math.pow(M * omega, 2));
+
+            canvas = document.getElementById('simulationCanvas');
+            ctx = canvas.getContext('2d');
+            width = canvas.width;
+            height = canvas.height;
+
+            building = {
+                x: width / 2,
+                y: height - 100,
+                width: 50,
+                height: 100
+            };
+
+            drawBackground();
+            animate();
+        }
+
+        function drawBackground() {
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#008000';
+            ctx.fillRect(building.x, building.y, building.width, building.height);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            t += 0.01;
+
+            building.y = height - 100 + amplitude * Math.sin(omega * t);
+
+            drawBackground();
+            ctx.fillStyle = '#008000';
+            ctx.fillRect(building.x, building.y, building.width, building.height);
+        }
+    </script>
+</body>
+</html>
